@@ -5,12 +5,12 @@ Setting up with Port exposure and Host volume
 ```bash
 k3d cluster create kafka-cluster \
   --agents 3 \
-    --port "30092:30092@server:*" \
-    --port "30093:30093@server:*" \
-    --port "30094:30094@server:*" \
-    --port "30095:30095@server:*" \
-    --port "30096:30096@server:*" \
-    --port "30097:30097@server:*" \
+  --port "30092:30092@server:*" \
+  --port "30093:30093@server:*" \
+  --port "30094:30094@server:*" \
+  --port "30095:30095@server:*" \
+  --port "30096:30096@server:*" \
+  --port "30097:30097@server:*" \
   --volume <HOSTPATH_KAFKA>:/opt/kafka@all \
   --volume <HOSTPATH_AIRFLOW>:/opt/airflow@all \
   --volume <HOSTPATH_SPARK>:/opt/spark@all
@@ -49,6 +49,7 @@ kubectl apply -f kafka-ui.yaml
 ```
 
 ## 3. Producer and Consumer for Kafka Test
+### 3.0. Customize App Images
 **Producer**
 ```bash
 docker build -f Dockerfile.producer -t dwnusa/my-producer:v0.1.1 .
@@ -60,6 +61,20 @@ kubectl run kafka-producer --restart='Never'   --image dwnusa/my-producer:v0.1.1
 docker build -f Dockerfile.consumer -t dwnusa/my-consumer:v0.0.1 .
 
 kubectl run kafka-consumer --restart='Never'   --image dwnusa/my-consumer:v0.0.1-amd64
+```
+### 3.1. Create Topic 
+```bash
+kubectl exec -it kafka-controller-0 -n kafka -- bash
+
+# Topic 생성
+```bash
+kafka-topics.sh --create \
+  --topic user-events \
+  --bootstrap-server kafka.kafka.svc.cluster.local:9092 \
+  --replication-factor 1 \
+  --partitions 3
+
+kafka-topics.sh --list --bootstrap-server kafka.kafka.svc.cluster.local:9092
 ```
 
 
@@ -76,14 +91,14 @@ kubectl create -f pvc-airflow.yaml -n airflow
 ### 4.2. Helm Install Airflow
 ```bash
 helm repo add \
-    --force-update apache-airflow https://airflow.apache.org
+  --force-update apache-airflow https://airflow.apache.org
 helm repo update
 ```
 ```bash
 helm upgrade \
-    --install airflow apache-airflow/airflow \
-    --namespace airflow \
-    -f airflow-values.yaml
+  --install airflow apache-airflow/airflow \
+  --namespace airflow \
+  -f airflow-values.yaml
 
 # or 
 
@@ -114,7 +129,7 @@ docker build -t dwnusa/spark:v3.5.4-amd64 .
 ### 5.1. Helm Install Spark
 ```bash
 helm repo add \
-    --force-update spark-operator https://kubeflow.github.io/spark-operator
+  --force-update spark-operator https://kubeflow.github.io/spark-operator
 helm repo update
 ```
 
@@ -123,11 +138,11 @@ helm repo update
 
 ```bash
 helm install spark-operator spark-operator/spark-operator \
-    --namespace spark-operator \
-    --create-namespace \
-    --set sparkJobNamespace=default \
-    --set rbac.create=true \
-    --set webhook.enable=true \
-    --set serviceAccounts.spark.name=spark \
-    --wait
+  --namespace spark-operator \
+  --create-namespace \
+  --set sparkJobNamespace=default \
+  --set rbac.create=true \
+  --set webhook.enable=true \
+  --set serviceAccounts.spark.name=spark \
+  --wait
 ```

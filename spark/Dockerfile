@@ -1,5 +1,6 @@
 FROM docker.io/library/spark:3.5.4
 WORKDIR /opt/spark-data
 
-# (1) jar는 spark 공식 이미지 경로에 복사
+RUN pip install python-dotenv pyspark pandas numpy matplotlib scikit-learn kafka-python
+
 COPY jars /opt/spark/jars/

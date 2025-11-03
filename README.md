@@ -36,7 +36,7 @@ helm install kafka bitnami/kafka \
   --create-namespace \
   -f values.yaml
 ```
-## 2.0. (manual installation tips)
+### 2.0. (manual installation tips)
 ```bash
 helm template kafka bitnami/kafka \
   --namespace kafka \
@@ -48,14 +48,14 @@ helm template kafka bitnami/kafka \
 kubectl apply -f kafka-ui.yaml
 ```
 
-### 3. Producer and Consumer for Kafka Test
-Producer
+## 3. Producer and Consumer for Kafka Test
+**Producer**
 ```bash
 docker build -f Dockerfile.producer -t dwnusa/my-producer:v0.1.1 .
 
 kubectl run kafka-producer --restart='Never'   --image dwnusa/my-producer:v0.1.1-amd64
 ```
-Consumer
+**Consumer**
 ```bash
 docker build -f Dockerfile.consumer -t dwnusa/my-consumer:v0.0.1 .
 
